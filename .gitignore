@@ -1,0 +1,10 @@
+.vs/
+
+x64/
+debug/
+
+test/Debug/
+test/x64/
+
+voxelDrama/Debug/
+voxelDrama/x64/
