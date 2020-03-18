@@ -1,8 +1,14 @@
 #include <iostream>
 #include "collider.h"
 
+#include "profiler.h"
+
 
 int main() {
+
+	startProfiling();
+	{
+		profileFunc();
 	sphereCollider sc;
 	sc.center = vec3d(4, -5, 6);
 	sc.rad = 10;
@@ -14,7 +20,16 @@ int main() {
 	std::cout << upper.x << " , " << upper.y << " , " << upper.z << std::endl;
 
 	std::cout << "hello world 0" << std::endl;
+	}
+	{
+		profileScope(t2)
+		for(int i = 0 ; i < 10 ; ++i)
+		std::cout << "hello world\n";
+	}
+	endProfiling();
 	int x;
 	std::cin >> x;
+
+
 	return 0;
 }
