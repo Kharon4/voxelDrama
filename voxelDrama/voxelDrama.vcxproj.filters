@@ -18,9 +18,15 @@
     <ClInclude Include="headers\collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\octree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\collider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\octree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

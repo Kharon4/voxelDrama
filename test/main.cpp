@@ -21,11 +21,6 @@ int main() {
 
 	std::cout << "hello world 0" << std::endl;
 	}
-	{
-		profileScope(t2)
-		for(int i = 0 ; i < 10 ; ++i)
-		std::cout << "hello world\n";
-	}
 	endProfiling();
 	int x;
 	std::cin >> x;
