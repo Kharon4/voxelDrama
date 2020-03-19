@@ -1,3 +1,5 @@
+
+#define cppIncluded 1
 #include "./../headers/octree.h"
 
 template<typename T>
