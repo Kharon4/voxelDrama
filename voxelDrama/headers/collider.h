@@ -59,3 +59,16 @@ public:
 	intersectionType inside(vec3d pt);
 };
 
+class compoundCollider : public collider {
+private:
+	std::vector<collider *>colls;
+public:
+	compoundCollider(const compoundCollider&) = delete;
+	compoundCollider& operator=(const compoundCollider&) = delete;
+	compoundCollider(std::vector<collider *> colliders);
+	~compoundCollider() { ; }
+
+	void boundingBox(vec3d& lower, vec3d& upper);
+	intersectionType inside(vec3d pt);
+};
+

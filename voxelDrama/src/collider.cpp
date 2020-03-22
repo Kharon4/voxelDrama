@@ -1,6 +1,5 @@
 #include "./../headers/collider.h"
 
-
 //sphere collider
 sphereCollider::sphereCollider(double Rad, vec3d Center) {
 	rad = Rad;
@@ -42,7 +41,7 @@ intersectionType cuboidCollider::inside(vec3d pt) {
 
 cuboidCollider::cuboidCollider(vec3d Center, vec3d Dim) {
 	center = Center;
-	dim = Dim;
+	dim = vec3d::multiply(Dim,0.5);
 	modify.push_back(&center);
 }
 
@@ -135,4 +134,44 @@ intersectionType meshCollider::inside(vec3d pt) {
 		else if (val == 0)rval = intersectionType::overlap;
 	}
 	return rval;
+}
+
+
+//compound collider
+compoundCollider::compoundCollider(std::vector<collider*> colliders) {
+	for (size_t i = 0; i < colliders.size(); ++i) {
+		colls.push_back(colliders[i]);
+		for (size_t j = 0; j < colliders[i]->modify.size(); ++j) {
+			modify.push_back(colliders[i]->modify[j]);
+		}
+		for (size_t j = 0; j < colliders[i]->modifyR.size(); ++j) {
+			modifyR.push_back(colliders[i]->modifyR[j]);
+		}
+	}
+}
+
+void compoundCollider::boundingBox(vec3d& lower, vec3d& upper) {
+	if (colls.size() == 0)return;
+	colls[0]->boundingBox(lower, upper);
+	vec3d L, U;
+	for (size_t i = 1; i < colls.size(); ++i) {
+		colls[i]->boundingBox(L, U);
+		lower.x = min(L.x, lower.x);
+		lower.y = min(L.y, lower.y);
+		lower.z = min(L.z, lower.z);
+		upper.x = max(U.x, upper.x);
+		upper.y = max(U.y, upper.y);
+		upper.z = max(U.z, upper.z);
+	}
+}
+
+intersectionType compoundCollider::inside(vec3d pt) {
+	intersectionType rVal = intersectionType::outside;
+	intersectionType temp;
+	for (size_t i = 0; i < colls.size(); ++i) {
+		temp = colls[i]->inside(pt);
+		if (temp == intersectionType::inside)return temp;
+		if(temp!= intersectionType::outside)rVal = temp;
+	}
+	return rVal;
 }

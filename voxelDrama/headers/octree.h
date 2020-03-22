@@ -25,8 +25,3 @@ public:
 };
 
 
-
-
-#ifndef cppIncluded
-#include"./../src/octree.cpp"
-#endif // temp

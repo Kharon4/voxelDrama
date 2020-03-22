@@ -15,3 +15,7 @@ enum class detectionResult{
 };
 
 ocNode<detectionResult>* createCollisionTree(collider* c1, collider* c2, unsigned char layers = defaultLayers);
+
+void simplifyCollisionTree(ocNode<detectionResult>* top);
+
+vec3d calcCOM(collider* c, unsigned char layers);

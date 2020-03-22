@@ -1,5 +1,4 @@
-
-#define cppIncluded 1
+#pragma once
 #include "./../headers/octree.h"
 
 template<typename T>
@@ -13,7 +12,6 @@ void ocNode<T>::deleteTree(){
 	for (unsigned char i = 0; i < 8; ++i) {
 		if (nodes[i] != nullptr)
 		{
-			nodes[i].deleteTree();
 			delete nodes[i];
 		}
 	}	
