@@ -1,7 +1,7 @@
 #pragma once
 
-#include "math/vec3.h"
-#include "math/linearMath.h"
+#include "math3D/vec3.h"
+#include "math3D/linearMath.h"
 #include <vector>
 
 enum intersectionType { outside = 0,overlap = 1, inside = 2 };
