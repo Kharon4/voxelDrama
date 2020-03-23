@@ -86,6 +86,7 @@ int main() {
 		consoleController::get()->draw(&data);
 		updateCam(t, tNr);
 		
+
 	}
 	cuboidCollider c1(vec3d(110, 0, 0), vec3d(10, 10, 10));
 	cuboidCollider c3(vec3d(0, 0, 0), vec3d(1, 1, 1));

@@ -1,11 +1,12 @@
 .vs/
 
-x64/
-debug/
+*.exe
+*.iobj
+*.ipdb
+*.pdb
 
-test/Debug/
-test/x64/
+bin/Intermediate/
+bin/Debug/
 
-voxelDrama/Debug/
-voxelDrama/x64/
+
 results.json
