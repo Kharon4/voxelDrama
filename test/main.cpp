@@ -6,6 +6,7 @@
 #include "consoleGraphics/renderer.h"
 #include "consoleGraphics/consoleController.h"
 #include "consoleGraphics/input.h"
+#include "physicalProperties.h"
 solidCharShader defaultShader(color::getColor(0.5,0,0.5));
 solidCharShader collpt(color::getColor(1, 0, 0));
 
@@ -82,7 +83,14 @@ int main() {
 	//setup colliders
 	cuboidCollider c1(vec3d(0, 0, 0), vec3d(10, 10, 10));
 	sphereCollider c2(10,vec3d(10, 0, 0));
-	
+	vec3d COM = calculateUniformCOM(&c2);
+	std::cout << COM.x << " , " << COM.y << " , " << COM.z<<std::endl;
+	tensorOfInertia TOI;
+	TOI = calculateUniformInertia(&c2, 1, COM);
+	std::cout << TOI.IX.x << " , " << TOI.IX.y << " , " << TOI.IX.z << std::endl;
+	std::cout << TOI.IY.x << " , " << TOI.IY.y << " , " << TOI.IY.z << std::endl;
+	std::cout << TOI.IZ.x << " , " << TOI.IZ.y << " , " << TOI.IZ.z << std::endl;
+
 	std::cout << colliding(&c1, &c2)<<std::endl;
 	std::cout << getAColPT(&c1, &c2).x << " , " << getAColPT(&c1, &c2).y <<" , "<< getAColPT(&c1, &c2).z << std::endl;
 	system("pause");
