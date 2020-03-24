@@ -1,21 +1,9 @@
 #pragma once
 
-#include"octree.h"
 #include"collider.h"
 
+#define defaultLayers 5 // dont make it greater than 8
 
-#define defaultLayers 10
+bool colliding(collider* c1, collider* c2, unsigned char layers = defaultLayers);
 
-enum class detectionResult{
-	NFD = 0 ,//[NFD]needs further division
-	nonColliding = 1 ,
-	colliding = 2,
-	nonCollidingNFD = 3 ,
-	collidingNFD = 4 
-};
-
-ocNode<detectionResult>* createCollisionTree(collider* c1, collider* c2, unsigned char layers = defaultLayers);
-
-void simplifyCollisionTree(ocNode<detectionResult>* top);
-
-vec3d calcCOM(collider* c, unsigned char layers);
+vec3d getAColPT(collider* c1, collider* c2, unsigned char layers = defaultLayers, bool* colResult = nullptr);
