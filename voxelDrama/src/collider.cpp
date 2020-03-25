@@ -21,6 +21,9 @@ intersectionType sphereCollider::inside(vec3d pt) {
 	return intersectionType::outside;
 }
 
+vec3d sphereCollider::getNormal(vec3d pt) {
+	return vec3d::normalize(pt - center);
+}
 
 //cuboid collider
 void cuboidCollider::boundingBox(vec3d& lower, vec3d& upper) {
@@ -45,6 +48,53 @@ cuboidCollider::cuboidCollider(vec3d Center, vec3d Dim) {
 	modify.push_back(&center);
 }
 
+vec3d cuboidCollider::getNormal(vec3d pt) {
+	vec3d lower , upper;
+	boundingBox(lower, upper);
+	unsigned char minPlane = 0;
+	double min = pt.x - lower.x;
+	double temp;
+	temp = upper.x - pt.x;
+	if (temp < min) {
+		min = temp;
+		minPlane = 1;
+	}
+	temp = pt.y - lower.y;
+	if (temp < min) {
+		min = temp;
+		minPlane = 2;
+	}
+	temp = upper.y - pt.y;
+	if (temp < min) {
+		min = temp;
+		minPlane = 3;
+	}
+	temp = pt.z - lower.z;
+	if (temp < min) {
+		min = temp;
+		minPlane = 4;
+	}
+	temp = upper.z - pt.z;
+	if (temp < min) {
+		minPlane = 5;
+	}
+	switch (minPlane)
+	{
+	case 0:
+		return vec3d(-1, 0, 0);
+	case 1:
+		return vec3d(1, 0, 0);
+	case 2:
+		return vec3d(0, -1, 0);
+	case 3:
+		return vec3d(0, 1, 0);
+	case 4:
+		return vec3d(0, 0, -1);
+	default:
+		return vec3d(0, 0, 1);
+	}
+
+}
 
 //capsule collider
 
@@ -94,6 +144,15 @@ intersectionType capsuleCollider::inside(vec3d pt) {
 	return intersectionType::overlap;
 }
 
+vec3d capsuleCollider::getNormal(vec3d pt) {
+	vec3d DR = b - a;
+	double component = vec3d::component((pt - a), DR);
+	if (component < 0)
+		return vec3d::normalize(pt - a);
+	if (component * component > DR.mag2())
+		return vec3d::normalize(pt - b);
+	else return vec3d::normalize((pt - a) - vec3d::dot(pt - a,DR) * (DR) / (DR).mag2());
+}
 
 //mesh collider
 
@@ -136,6 +195,19 @@ intersectionType meshCollider::inside(vec3d pt) {
 	return rval;
 }
 
+vec3d meshCollider::getNormal(vec3d pt) {
+	if (modify.size())return vec3d(0,0,0);
+	size_t meshId = 0;
+	double min = abs(linearMathD::aDistance(pt,linearMathD::plane(PTs[0],DRs[0])));
+	for (size_t i = 1; i < modify.size(); ++i) {
+		double dist = abs(linearMathD::aDistance(pt, linearMathD::plane(PTs[i], DRs[i])));
+		if (dist < min) {
+			min = dist;
+			meshId = i;
+		}
+	}
+	return DRs[meshId];
+}
 
 //compound collider
 compoundCollider::compoundCollider(std::vector<collider*> colliders) {
@@ -174,4 +246,13 @@ intersectionType compoundCollider::inside(vec3d pt) {
 		if(temp!= intersectionType::outside)rVal = temp;
 	}
 	return rVal;
+}
+
+vec3d compoundCollider::getNormal(vec3d pt) {
+	for (size_t i = 0; i < colls.size(); ++i) {
+		if (colls[i]->inside(pt)) {
+			return colls[i]->getNormal(pt);
+		}
+	}
+	return vec3d(0, 0, 0);
 }

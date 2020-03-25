@@ -12,6 +12,7 @@ public:
 	std::vector<vec3d*> modifyR;//only rotational modification for free vectors
 	virtual void boundingBox(vec3d& lower, vec3d& upper) {};
 	virtual intersectionType inside(vec3d pt) { return intersectionType::outside; };
+	virtual vec3d getNormal(vec3d pt) { return vec3d(1, 0, 0); }//unit vector pointing outward
 };
 
 
@@ -23,6 +24,7 @@ public:
 	sphereCollider(double Rad = 1, vec3d Center = vec3d(0,0,0));
 	void boundingBox(vec3d& lower, vec3d& upper);
 	intersectionType inside(vec3d pt);
+	vec3d getNormal(vec3d pt);
 };
 
 class cuboidCollider : public collider {//grid alligned
@@ -33,6 +35,7 @@ public:
 	cuboidCollider(vec3d Center = vec3d(0, 0, 0), vec3d Dim = vec3d(1, 1, 1));
 	void boundingBox(vec3d& lower, vec3d& upper);
 	intersectionType inside(vec3d pt);
+	vec3d getNormal(vec3d pt);
 };
 
 class capsuleCollider : public collider {
@@ -42,6 +45,7 @@ public:
 	capsuleCollider(vec3d A = vec3d(0,0,1), vec3d B = vec3d(0,0,-1), double rad = 1);
 	void boundingBox(vec3d& lower, vec3d& upper);
 	intersectionType inside(vec3d pt);
+	vec3d getNormal(vec3d pt);
 };
 
 class meshCollider : public collider {//convex hull with normals outward
@@ -57,6 +61,7 @@ public:
 
 	void boundingBox(vec3d& lower, vec3d& upper);
 	intersectionType inside(vec3d pt);
+	vec3d getNormal(vec3d pt);
 };
 
 class compoundCollider : public collider {
@@ -70,5 +75,6 @@ public:
 
 	void boundingBox(vec3d& lower, vec3d& upper);
 	intersectionType inside(vec3d pt);
+	vec3d getNormal(vec3d pt);
 };
 

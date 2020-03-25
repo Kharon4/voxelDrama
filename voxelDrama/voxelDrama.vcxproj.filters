@@ -27,6 +27,9 @@
     <ClInclude Include="headers\physicalProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="headers\collisionReaction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\collider.cpp">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\physicalProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisionReaction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

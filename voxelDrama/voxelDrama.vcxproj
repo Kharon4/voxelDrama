@@ -21,12 +21,14 @@
   <ItemGroup>
     <ClInclude Include="headers\collider.h" />
     <ClInclude Include="headers\collisionDetection.h" />
+    <ClInclude Include="headers\collisionReaction.h" />
     <ClInclude Include="headers\octree.h" />
     <ClInclude Include="headers\physicalProperties.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\collider.cpp" />
     <ClCompile Include="src\collisionDetection.cpp" />
+    <ClCompile Include="src\collisionReaction.cpp" />
     <ClCompile Include="src\octree.cpp" />
     <ClCompile Include="src\physicalProperties.cpp" />
   </ItemGroup>
