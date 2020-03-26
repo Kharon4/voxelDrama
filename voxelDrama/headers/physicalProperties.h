@@ -1,7 +1,7 @@
 #pragma once
 #include "collider.h";
 
-enum class combinationTechnique{average , greaterVal , lowerVal , thisVal , otherVal};
+enum class combinationTechnique{average, greaterVal , lowerVal , thisVal , otherVal};
 
 struct physicalMaterial{
 	size_t materialIndex = 0;//higher wins
@@ -11,6 +11,8 @@ struct physicalMaterial{
 	float coeffRFriction;
 };
 
+static const physicalMaterial defaultPMat = {0,combinationTechnique::average,0.5f,0.5f,0.0f };
+
 struct tensorOfInertia {
 	vec3d IX;
 	vec3d IY;
@@ -19,6 +21,12 @@ struct tensorOfInertia {
 	vec3d IYInv;
 	vec3d IZInv;
 };
+
+vec3d operator *(tensorOfInertia& t, vec3d& v);
+vec3d operator *(vec3d& v, tensorOfInertia& t);
+vec3d operator /(tensorOfInertia& t, vec3d& v);
+vec3d operator /(vec3d& v ,tensorOfInertia& t);
+
 
 struct kineticProperties {
 	vec3d COM;
