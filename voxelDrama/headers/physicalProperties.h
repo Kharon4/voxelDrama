@@ -15,6 +15,9 @@ struct tensorOfInertia {
 	vec3d IX;
 	vec3d IY;
 	vec3d IZ;
+	vec3d IXInv;
+	vec3d IYInv;
+	vec3d IZInv;
 };
 
 struct kineticProperties {
@@ -31,4 +34,4 @@ struct dynamicProperties {
 };
 
 vec3d calculateUniformCOM(collider* c, unsigned char detail = 20);
-tensorOfInertia calculateUniformInertia(collider* c, double Mass, vec3d about, unsigned char detail = 20);
+tensorOfInertia calculateUniformInertia(collider* c, double Mass, vec3d about, unsigned char detail = 20 ,bool* err = nullptr);
