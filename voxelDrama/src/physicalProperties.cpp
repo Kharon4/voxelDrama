@@ -119,28 +119,28 @@ tensorOfInertia calculateUniformInertia(collider* c, double Mass, vec3d about, u
 	return TOI;
 }
 
-vec3d operator *(tensorOfInertia& t, vec3d& v) {
+vec3d operator *(tensorOfInertia t, vec3d v) {
 	vec3d rVal;
 	rVal.x = vec3d::dot(t.IX, v);
 	rVal.y = vec3d::dot(t.IY, v);
 	rVal.z = vec3d::dot(t.IZ, v);
 	return rVal;
 }
-vec3d operator *(vec3d& v, tensorOfInertia& t) {
+vec3d operator *(vec3d v, tensorOfInertia t) {
 	vec3d rVal;
 	rVal.x = vec3d::dot(t.IX, v);
 	rVal.y = vec3d::dot(t.IY, v);
 	rVal.z = vec3d::dot(t.IZ, v);
 	return rVal;
 }
-vec3d operator /(tensorOfInertia& t, vec3d& v) {
+vec3d operator /(tensorOfInertia t, vec3d v) {
 	vec3d rVal;
 	rVal.x = vec3d::dot(t.IXInv, v);
 	rVal.y = vec3d::dot(t.IYInv, v);
 	rVal.z = vec3d::dot(t.IZInv, v);
 	return rVal;
 }
-vec3d operator /(vec3d& v, tensorOfInertia& t) {
+vec3d operator /(vec3d v, tensorOfInertia t) {
 	vec3d rVal;
 	rVal.x = vec3d::dot(t.IXInv, v);
 	rVal.y = vec3d::dot(t.IYInv, v);

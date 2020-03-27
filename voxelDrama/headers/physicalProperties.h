@@ -22,10 +22,10 @@ struct tensorOfInertia {
 	vec3d IZInv;
 };
 
-vec3d operator *(tensorOfInertia& t, vec3d& v);
-vec3d operator *(vec3d& v, tensorOfInertia& t);
-vec3d operator /(tensorOfInertia& t, vec3d& v);
-vec3d operator /(vec3d& v ,tensorOfInertia& t);
+vec3d operator *(tensorOfInertia t, vec3d v);
+vec3d operator *(vec3d v, tensorOfInertia t);
+vec3d operator /(tensorOfInertia t, vec3d v);
+vec3d operator /(vec3d v ,tensorOfInertia t);
 
 
 struct kineticProperties {
