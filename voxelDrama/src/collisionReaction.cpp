@@ -1,4 +1,4 @@
-#include "./../headers/collisionReaction.h"
+#include "collisionReaction.h"
 
 inline vec3d calculatePtVel(kineticProperties kp, vec3d pt) {
 	return kp.vel + (kp.angularVel * (pt - kp.COM));

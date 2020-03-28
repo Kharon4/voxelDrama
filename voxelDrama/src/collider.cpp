@@ -1,4 +1,4 @@
-#include "./../headers/collider.h"
+#include "collider.h"
 
 //sphere collider
 sphereCollider::sphereCollider(double Rad, vec3d Center) {

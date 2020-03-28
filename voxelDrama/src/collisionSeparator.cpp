@@ -1,4 +1,4 @@
-#include "./../headers/collisionSeparator.h"
+#include "collisionSeparator.h"
 
 
 vec3d getMaxSeparationVector(collider* c1, collider* c2, vec3d axis /*dir in which c2 must be moved*/) {//only c2 will be moved

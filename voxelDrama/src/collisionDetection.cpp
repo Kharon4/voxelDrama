@@ -1,4 +1,4 @@
-#include "./../headers/collisionDetection.h"
+#include "collisionDetection.h"
 
 #include <iostream> //for debugging
 

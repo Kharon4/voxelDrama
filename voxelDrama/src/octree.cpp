@@ -1,5 +1,5 @@
 #pragma once
-#include "./../headers/octree.h"
+#include "octree.h"
 
 template<typename T>
 ocNode<T>::ocNode() {
