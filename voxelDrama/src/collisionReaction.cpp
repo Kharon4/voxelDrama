@@ -98,7 +98,7 @@ void calculateNewVel(collider* c1, collider* c2, dynamicProperties* d1, dynamicP
 	double nImpulseMag = vec3d::dot((initVels[1] - initVels[0]), colNormal)*(p.coeffRestitution-1)/ (k1 - k0);
 	double pImpusleMag = nImpulseMag * p.coeffLFriction;
 	if (pImpusleMag > abs(vec3d::dot((initVels[1] - initVels[0]), colParallel)) * (d1->mass*d2->mass/(d1->mass+d2->mass)))
-		pImpusleMag = abs(vec3d::dot((initVels[1] - initVels[0]), colParallel)) * (d1->mass * d2->mass / (d1->mass + d2->mass);
+		pImpusleMag = abs(vec3d::dot((initVels[1] - initVels[0]), colParallel)) * (d1->mass * d2->mass / (d1->mass + d2->mass));
 	
 	//implement normal Angular Impulse
 	//double nAngularImpulseMag = nImpulseMag * p.coeffRFriction;
