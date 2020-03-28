@@ -23,6 +23,7 @@
     <ClInclude Include="headers\collisionDetection.h" />
     <ClInclude Include="headers\collisionReaction.h" />
     <ClInclude Include="headers\collisionSeparator.h" />
+    <ClInclude Include="headers\interactions.h" />
     <ClInclude Include="headers\octree.h" />
     <ClInclude Include="headers\physicalProperties.h" />
     <ClInclude Include="headers\VoxelDrama_Core.h" />
@@ -32,6 +33,7 @@
     <ClCompile Include="src\collisionDetection.cpp" />
     <ClCompile Include="src\collisionReaction.cpp" />
     <ClCompile Include="src\collisionSeparator.cpp" />
+    <ClCompile Include="src\interactions.cpp" />
     <ClCompile Include="src\octree.cpp" />
     <ClCompile Include="src\physicalProperties.cpp" />
     <ClCompile Include="src\VoxelDrama_Core.cpp" />

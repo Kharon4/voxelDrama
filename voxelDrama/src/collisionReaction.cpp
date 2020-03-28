@@ -91,8 +91,8 @@ void calculateNewVel(collider* c1, collider* c2, dynamicProperties* d1, dynamicP
 	//coll parameters
 	physicalMaterial p = getCollphysicalMat(d1->pMat, d2->pMat);
 
-	double k0 = (1 / d1->mass) + vec3d::dot(vec3d::cross((vec3d::cross(colNormal, r[0]) / d1->TOI), r[0]), colNormal);
-	double k1 = (1 / d2->mass) + vec3d::dot(vec3d::cross((vec3d::cross(colNormal, r[1]) / d2->TOI), r[1]), colNormal);
+	double k0 = (1 / d1->mass) + vec3d::dot(vec3d::cross((vec3d::cross(r[0], colNormal) / d1->TOI), r[0]), colNormal);
+	double k1 = (1 / d2->mass) + vec3d::dot(vec3d::cross((vec3d::cross(r[1], colNormal) / d2->TOI), r[1]), colNormal);
 	k1 = -k1;//adjusting for -ve force dir
 
 	double nImpulseMag = vec3d::dot((initVels[1] - initVels[0]), colNormal)*(p.coeffRestitution-1)/ (k1 - k0);
