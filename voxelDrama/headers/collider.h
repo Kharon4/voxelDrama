@@ -2,14 +2,16 @@
 
 #include "math3D/vec3.h"
 #include "math3D/linearMath.h"
+#include "math3D/rotation.h"
 #include <vector>
 
 enum intersectionType { outside = 0,overlap = 1, inside = 2 };
 
 class collider {
 public:
-	std::vector<vec3d*> modify;//total modification
-	std::vector<vec3d*> modifyR;//only rotational modification for free vectors
+	manipulation3dD::transform M;//modify
+	manipulation3dD::transform MR;//modify ony rotate
+	manipulation3dD::transform MT;//modify only translate
 	virtual void boundingBox(vec3d& lower, vec3d& upper) {};
 	virtual intersectionType inside(vec3d pt) { return intersectionType::outside; };
 	virtual vec3d getNormal(vec3d pt) { return vec3d(1, 0, 0); }//unit vector pointing outward
@@ -56,7 +58,7 @@ private:
 public:
 	meshCollider(const meshCollider&) = delete;
 	meshCollider& operator=(const meshCollider&) = delete;
-	meshCollider(std::vector<linearMathD::plane>* Planes);
+	meshCollider(std::vector<linearMathD::plane>* Planes, vec3d center = vec3d(0,0,0));
 	~meshCollider();
 
 	void boundingBox(vec3d& lower, vec3d& upper);

@@ -4,7 +4,10 @@
 sphereCollider::sphereCollider(double Rad, vec3d Center) {
 	rad = Rad;
 	center = Center;
-	modify.push_back(&center);
+	M.CS.setOrigin(center);
+	MR.CS.setOrigin(center);
+	MT.CS.setOrigin(center);
+	MT.addVec(center, &center);
 }
 
 void sphereCollider::boundingBox(vec3d& lower, vec3d& upper) {
@@ -45,7 +48,10 @@ intersectionType cuboidCollider::inside(vec3d pt) {
 cuboidCollider::cuboidCollider(vec3d Center, vec3d Dim) {
 	center = Center;
 	dim = vec3d::multiply(Dim,0.5);
-	modify.push_back(&center);
+	M.CS.setOrigin(center);
+	MR.CS.setOrigin(center);
+	MT.CS.setOrigin(center);
+	MT.addVec(center, &center);
 }
 
 vec3d cuboidCollider::getNormal(vec3d pt) {
@@ -102,8 +108,12 @@ capsuleCollider::capsuleCollider(vec3d A, vec3d B, double rad) {
 	a = A;
 	b = B;
 	r = rad;
-	modify.push_back(&a);
-	modify.push_back(&b);
+	vec3d center = (a + b) / 2;
+	M.CS.setOrigin(center);
+	MR.CS.setOrigin(center);
+	MT.CS.setOrigin(center);
+	M.addVec(a, &a);
+	M.addVec(b, &b);
 }
 
 #define min(x,y) ((x<y)?x:y)
@@ -156,14 +166,17 @@ vec3d capsuleCollider::getNormal(vec3d pt) {
 
 //mesh collider
 
-meshCollider::meshCollider(std::vector<linearMathD::plane>* Planes) {
+meshCollider::meshCollider(std::vector<linearMathD::plane>* Planes,vec3d center) {
 	DRs = new vec3d[(*Planes).size()];
 	PTs = new vec3d[(*Planes).size()];
+	M.CS.setOrigin(center);
+	MR.CS.setOrigin(center);
+	MT.CS.setOrigin(center);
 	for (size_t i = 0; i < Planes->size(); ++i) {
 		DRs[i] = (*Planes)[i].getDr();
 		PTs[i] = (*Planes)[i].getPt();
-		modify.push_back(PTs + i);
-		modifyR.push_back(DRs + i);
+		M.addVec(PTs[i], PTs + i);
+		MR.addVec(DRs[i], DRs + i);
 	}
 }
 
@@ -175,7 +188,7 @@ meshCollider::~meshCollider() {
 void meshCollider::boundingBox(vec3d& lower, vec3d& upper) {
 	lower = PTs[0];
 	upper = PTs[0];
-	for (size_t i = 0; i < modify.size(); ++i) {
+	for (size_t i = 0; i < (*M.getData()).size(); ++i) {
 		if (lower.x > PTs[i].x)lower.x = PTs[i].x;
 		if (lower.y > PTs[i].y)lower.y = PTs[i].y;
 		if (lower.z > PTs[i].z)lower.z = PTs[i].z;
@@ -187,7 +200,7 @@ void meshCollider::boundingBox(vec3d& lower, vec3d& upper) {
 
 intersectionType meshCollider::inside(vec3d pt) {
 	intersectionType rval = intersectionType::inside;
-	for (size_t i = 0; i < modify.size(); ++i) {
+	for (size_t i = 0; i < (*M.getData()).size(); ++i) {
 		double val = vec3d::dot(vec3d::subtract(pt, PTs[i]), DRs[i]);
 		if (val > 0)return intersectionType::outside;
 		else if (val == 0)rval = intersectionType::overlap;
@@ -196,10 +209,10 @@ intersectionType meshCollider::inside(vec3d pt) {
 }
 
 vec3d meshCollider::getNormal(vec3d pt) {
-	if (modify.size())return vec3d(0,0,0);
+	if ((*M.getData()).size())return vec3d(0,0,0);
 	size_t meshId = 0;
 	double min = abs(linearMathD::aDistance(pt,linearMathD::plane(PTs[0],DRs[0])));
-	for (size_t i = 1; i < modify.size(); ++i) {
+	for (size_t i = 1; i < (*M.getData()).size(); ++i) {
 		double dist = abs(linearMathD::aDistance(pt, linearMathD::plane(PTs[i], DRs[i])));
 		if (dist < min) {
 			min = dist;
@@ -213,11 +226,14 @@ vec3d meshCollider::getNormal(vec3d pt) {
 compoundCollider::compoundCollider(std::vector<collider*> colliders) {
 	for (size_t i = 0; i < colliders.size(); ++i) {
 		colls.push_back(colliders[i]);
-		for (size_t j = 0; j < colliders[i]->modify.size(); ++j) {
-			modify.push_back(colliders[i]->modify[j]);
+		for (size_t j = 0; j < (*(*colliders[i]).M.getData()).size(); ++j) {
+			M.addVec((*colliders[i]->M.getData())[j], &(*colliders[i]->M.getData())[j]);
 		}
-		for (size_t j = 0; j < colliders[i]->modifyR.size(); ++j) {
-			modifyR.push_back(colliders[i]->modifyR[j]);
+		for (size_t j = 0; j < (*(*colliders[i]).MR.getData()).size(); ++j) {
+			MR.addVec((*colliders[i]->MR.getData())[j], &(*colliders[i]->MR.getData())[j]);
+		}
+		for (size_t j = 0; j < (*(*colliders[i]).MT.getData()).size(); ++j) {
+			MT.addVec((*colliders[i]->MT.getData())[j], &(*colliders[i]->MT.getData())[j]);
 		}
 	}
 }
