@@ -7,9 +7,13 @@
 #include "consoleGraphics/consoleController.h"
 #include "consoleGraphics/input.h"
 #include "physicalProperties.h"
+#include "collisionSeparator.h"
 solidCharShader defaultShader(color::getColor(0.5,0,0.5));
-solidCharShader collpt(color::getColor(1, 0, 0));
 
+solidCharShader collpt(color::getColor(1, 0, 0));
+solidCharShader red(color::getColor(1, 0, 0));
+solidCharShader green(color::getColor(0, 1, 0));
+solidCharShader blue(color::getColor(0, 0, 1));
 
 
 void updateCam(manipulation3dD::transform& t, manipulation3dD::transform& tNr) {
@@ -81,20 +85,35 @@ int main() {
 	consoleController::get(camera.sc.xPixels, camera.sc.yPixels, L"ConsoleGraphics - by AbhishekKhurana");
 	
 	//setup colliders
-	cuboidCollider c1(vec3d(0, 0, 0), vec3d(10, 10, 10));
-	sphereCollider c2(10,vec3d(10, 0, 0));
-	vec3d COM = calculateUniformCOM(&c2);
-	std::cout << COM.x << " , " << COM.y << " , " << COM.z<<std::endl;
-	tensorOfInertia TOI;
-	TOI = calculateUniformInertia(&c2, 1, COM);
-	std::cout << TOI.IX.x << " , " << TOI.IX.y << " , " << TOI.IX.z << std::endl;
-	std::cout << TOI.IY.x << " , " << TOI.IY.y << " , " << TOI.IY.z << std::endl;
-	std::cout << TOI.IZ.x << " , " << TOI.IZ.y << " , " << TOI.IZ.z << std::endl;
+	double scale = 10;
+	cuboidCollider c1(vec3d(0, 0, 0), vec3d(scale, scale, scale));
+	sphereCollider c2(scale,vec3d(1, 1, -3));
+	_globalWorld.lines.push_back(mesh::line(vec3d(0, 0, 0), vec3d(scale * 0.9, 0, 0), &red));
+	_globalWorld.lines.push_back(mesh::line(vec3d(0, 0, 0), vec3d(0, scale * 0.9, 0), &green));
+	_globalWorld.lines.push_back(mesh::line(vec3d(0, 0, 0), vec3d(0, 0, scale * 0.9), &blue));
+	_globalWorld.lines.push_back(mesh::line(c2.center, c2.center + vec3d(scale * 0.9, 0, 0), &red));
+	_globalWorld.lines.push_back(mesh::line(c2.center, c2.center + vec3d(0, scale * 0.9, 0), &green));
+	_globalWorld.lines.push_back(mesh::line(c2.center, c2.center + vec3d(0, 0, scale * 0.9), &blue));
+	c1.M.addVec(_globalWorld.lines[0].pts[0], _globalWorld.lines[0].pts);
+	c1.M.addVec(_globalWorld.lines[0].pts[1], _globalWorld.lines[0].pts + 1);
+	c1.M.addVec(_globalWorld.lines[1].pts[0], _globalWorld.lines[1].pts);
+	c1.M.addVec(_globalWorld.lines[1].pts[1], _globalWorld.lines[1].pts + 1);
+	c1.M.addVec(_globalWorld.lines[2].pts[0], _globalWorld.lines[2].pts);
+	c1.M.addVec(_globalWorld.lines[2].pts[1], _globalWorld.lines[2].pts + 1);
+	c2.M.addVec(_globalWorld.lines[3].pts[0], _globalWorld.lines[3].pts);
+	c2.M.addVec(_globalWorld.lines[3].pts[1], _globalWorld.lines[3].pts + 1);
+	c2.M.addVec(_globalWorld.lines[4].pts[0], _globalWorld.lines[4].pts);
+	c2.M.addVec(_globalWorld.lines[4].pts[1], _globalWorld.lines[4].pts + 1);
+	c2.M.addVec(_globalWorld.lines[5].pts[0], _globalWorld.lines[5].pts);
+	c2.M.addVec(_globalWorld.lines[5].pts[1], _globalWorld.lines[5].pts + 1);
 
-	std::cout << colliding(&c1, &c2)<<std::endl;
-	std::cout << getAColPT(&c1, &c2).x << " , " << getAColPT(&c1, &c2).y <<" , "<< getAColPT(&c1, &c2).z << std::endl;
+	//std::cout << colliding(&c1, &c2)<<std::endl;
+	//std::cout << getAColPT(&c1, &c2).x << " , " << getAColPT(&c1, &c2).y <<" , "<< getAColPT(&c1, &c2).z << std::endl;
 	system("pause");
-
+	vec3d finalSep;
+	//separateTillLastColl(&c1, &c2, c2.center - c1.center, finalSep);
+	//performLastSep(&c2, finalSep);
+	separateColliders(&c1, &c2, c2.center - c1.center);
 	//loop
 	while (1) {
 		data = _globalWorld.render(camera.sc, camera.vertex, color::getColor(0, 0, 0));

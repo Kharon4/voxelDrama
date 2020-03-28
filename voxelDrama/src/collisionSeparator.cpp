@@ -8,11 +8,11 @@ vec3d getMaxSeparationVector(collider* c1, collider* c2, vec3d axis /*dir in whi
 	c2->boundingBox(l2, u2);
 	double t = -1;
 	
-	if (axis.x < 0)t = (u2.x - l1.x) / axis.x;
+	if (axis.x < 0)t = (l1.x - u2.x) / axis.x;
 	else if(axis.x >0)t = (u1.x - l2.x) / axis.x;
 
 	if (axis.y < 0) {
-		double temp = (u2.y - l1.y) / axis.y;
+		double temp = (l1.y - u2.y) / axis.y;
 		if (temp < t || t < 0)t = temp;
 	}
 	else if (axis.y > 0) {
@@ -21,7 +21,7 @@ vec3d getMaxSeparationVector(collider* c1, collider* c2, vec3d axis /*dir in whi
 	}
 
 	if (axis.z < 0) {
-		double temp = (u2.z - l1.z) / axis.z;
+		double temp = (l1.z - u2.z) / axis.z;
 		if (temp < t || t < 0)t = temp;
 	}
 	else if (axis.z > 0) {
@@ -70,6 +70,35 @@ vec3d separateTillLastColl(collider* c1, collider* c2, vec3d axis, vec3d& OUTfin
 void performLastSep(collider* c2, vec3d finalSep) {
 	c2->M.CS.setOrigin(finalSep);
 	c2->MT.CS.setOrigin(finalSep);
+	c2->M.update();
+	c2->MT.update();
+}
+
+
+void separateColliders(collider* c1, collider* c2, vec3d axis, unsigned char layers) {
+	vec3d maxSep = getMaxSeparationVector(c1, c2, axis);
+	vec3d lastUncollided = maxSep + c2->M.CS.getOrigin();
+	maxSep /= 2;
+	c2->M.CS.setOrigin(c2->M.CS.getOrigin() + maxSep);
+	c2->MT.CS.setOrigin(c2->MT.CS.getOrigin() + maxSep);
+	c2->M.update();
+	c2->MT.update();
+	for (unsigned char i = 0; i < layers; ++i) {
+		maxSep /= 2;
+		if (colliding(c1, c2)) {
+			c2->M.CS.setOrigin(c2->M.CS.getOrigin() + maxSep);
+			c2->MT.CS.setOrigin(c2->MT.CS.getOrigin() + maxSep);
+		}
+		else {
+			lastUncollided = c2->M.CS.getOrigin();
+			c2->M.CS.setOrigin(c2->M.CS.getOrigin() - maxSep);
+			c2->MT.CS.setOrigin(c2->MT.CS.getOrigin() - maxSep);
+		}
+		c2->M.update();
+		c2->MT.update();
+	}
+	c2->M.CS.setOrigin(lastUncollided);
+	c2->MT.CS.setOrigin(lastUncollided);
 	c2->M.update();
 	c2->MT.update();
 }
