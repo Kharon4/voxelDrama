@@ -80,11 +80,11 @@ void physicalWorld::update() {
 			if (colliding(staticColls[i], colls[j])) {
 				//resolve collision
 				//get resolving axis
-				vec3d axis = DP[j].kP.vel - staticDP[i].kP.vel;
+				vec3d axis = staticDP[i].kP.vel-DP[j].kP.vel;
 				if (vec3d::isNUL(axis))axis = DP[j].kP.COM - staticDP[i].kP.COM;
 				if (vec3d::isNUL(axis))axis = vec3d(1, 0, 0);
 				vec3d finalSep;
-				vec3d collPt = separateTillLastColl(staticColls[i], colls[j], -axis, finalSep);
+				vec3d collPt = separateTillLastColl(staticColls[i], colls[j], axis, finalSep);
 				//calculate reaction
 				calculateNewVel(staticColls[i], colls[j], &staticDP[i], &DP[j], collPt, true);
 				//final separation
@@ -98,11 +98,11 @@ void physicalWorld::update() {
 		for (size_t j = i + 1; j < colls.size(); ++j) {
 			//resolve collision
 			//get resolving axis
-			vec3d axis = DP[j].kP.vel - DP[i].kP.vel;
+			vec3d axis = DP[i].kP.vel - DP[j].kP.vel;
 			if (vec3d::isNUL(axis))axis = DP[j].kP.COM - DP[i].kP.COM;
 			if (vec3d::isNUL(axis))axis = vec3d(1, 0, 0);
 			vec3d finalSep;
-			vec3d collPt = separateTillLastColl(colls[i], colls[j], -axis, finalSep);
+			vec3d collPt = separateTillLastColl(colls[i], colls[j], axis, finalSep);
 			//calculate reaction
 			calculateNewVel(staticColls[i], colls[j], &DP[i], &DP[j], collPt, false);
 			//final separation

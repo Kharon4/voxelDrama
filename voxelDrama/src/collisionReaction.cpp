@@ -103,18 +103,31 @@ void calculateNewVel(collider* c1, collider* c2, dynamicProperties* d1, dynamicP
 	double nImpulseMag = vec3d::dot((initVels[1] - initVels[0]), colNormal)*(-p.coeffRestitution-1)/ (k1 - k0);
 	//std::cout << "nImpulse = " << nImpulseMag << std::endl;
 	double pImpusleMag = abs(nImpulseMag * p.coeffLFriction);
-	if (pImpusleMag > abs(vec3d::dot((initVels[1] - initVels[0]), colParallel)) * (d1->mass*d2->mass/(d1->mass+d2->mass)))
+	if (STATIC) {
+		if (pImpusleMag > abs(vec3d::dot((initVels[1] - initVels[0]), colParallel))* (d1->mass))
+			pImpusleMag = abs(vec3d::dot((initVels[1] - initVels[0]), colParallel)) * (d1->mass);
+	}
+	//change for static
+	else if (pImpusleMag > abs(vec3d::dot((initVels[1] - initVels[0]), colParallel)) * (d1->mass*d2->mass/(d1->mass+d2->mass)))
 		pImpusleMag = abs(vec3d::dot((initVels[1] - initVels[0]), colParallel)) * (d1->mass * d2->mass / (d1->mass + d2->mass));
 	
 	//implement normal Angular Impulse
-	//double nAngularImpulseMag = nImpulseMag * p.coeffRFriction;
-	//condition not known ??
+	double nAngularImpulseMag = nImpulseMag * p.coeffRFriction;
+	//
+	double wDiff = abs(vec3d::dot(d1->kP.angularVel- d2->kP.angularVel, colNormal));
+	if (vec3d::dot(nAngularImpulseMag * (colNormal / d1->TOI + colNormal / d2->TOI), colNormal) >= wDiff) {
+		d2->kP.angularVel += (vec3d::dot(d1->kP.angularVel- d2->kP.angularVel, colNormal)) *colNormal;
+		nAngularImpulseMag = 0;
+	}
 
+	if (vec3d::dot(d1->kP.angularVel - d2->kP.angularVel, colNormal) > 0)nAngularImpulseMag *= -1;
 	vec3d netImpulse = nImpulseMag * colNormal - pImpusleMag * colParallel;//force on body 1
 	if (!STATIC) {
 		d1->kP.vel += netImpulse / d1->mass;
 		d1->kP.angularVel += vec3d::cross(r[0], netImpulse) / d1->TOI;
+		d1->kP.angularVel += nAngularImpulseMag*colNormal / d1->TOI;
 	}
 	d2->kP.vel -= netImpulse / d2->mass;
 	d2->kP.angularVel += vec3d::cross(r[1], -netImpulse) / d2->TOI;
+	d2->kP.angularVel -= nAngularImpulseMag * colNormal / d2->TOI;
 }
