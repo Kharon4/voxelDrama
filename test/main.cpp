@@ -6,8 +6,7 @@
 #include "consoleGraphics/renderer.h"
 #include "consoleGraphics/consoleController.h"
 #include "consoleGraphics/input.h"
-#include "physicalProperties.h"
-#include "collisionSeparator.h"
+#include "VoxelDrama_Core.h"
 solidCharShader defaultShader(color::getColor(0.5,0,0.5));
 
 solidCharShader collpt(color::getColor(1, 0, 0));
@@ -87,13 +86,13 @@ int main() {
 	//setup colliders
 	double scale = 10;
 	cuboidCollider c1(vec3d(0, 0, 0), vec3d(scale, scale, scale));
-	sphereCollider c2(scale,vec3d(1, 1, -3));
-	_globalWorld.lines.push_back(mesh::line(vec3d(0, 0, 0), vec3d(scale * 0.9, 0, 0), &red));
-	_globalWorld.lines.push_back(mesh::line(vec3d(0, 0, 0), vec3d(0, scale * 0.9, 0), &green));
-	_globalWorld.lines.push_back(mesh::line(vec3d(0, 0, 0), vec3d(0, 0, scale * 0.9), &blue));
-	_globalWorld.lines.push_back(mesh::line(c2.center, c2.center + vec3d(scale * 0.9, 0, 0), &red));
-	_globalWorld.lines.push_back(mesh::line(c2.center, c2.center + vec3d(0, scale * 0.9, 0), &green));
-	_globalWorld.lines.push_back(mesh::line(c2.center, c2.center + vec3d(0, 0, scale * 0.9), &blue));
+	sphereCollider c2(scale,vec3d(-30, 0, 50));
+	_globalWorld.lines.push_back(mesh::line(-vec3d(scale * 0.5, 0, 0), vec3d(scale * 0.5, 0, 0), &red));
+	_globalWorld.lines.push_back(mesh::line(-vec3d(0, scale * 0.5, 0), vec3d(0, scale * 0.5, 0), &green));
+	_globalWorld.lines.push_back(mesh::line(-vec3d(0, 0, scale * 0.5), vec3d(0, 0, scale * 0.5), &blue));
+	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(scale, 0, 0), c2.center + vec3d(scale, 0, 0), &red));
+	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, scale, 0), c2.center + vec3d(0, scale, 0), &green));
+	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, 0, scale), c2.center + vec3d(0, 0, scale), &blue));
 	c1.M.addVec(_globalWorld.lines[0].pts[0], _globalWorld.lines[0].pts);
 	c1.M.addVec(_globalWorld.lines[0].pts[1], _globalWorld.lines[0].pts + 1);
 	c1.M.addVec(_globalWorld.lines[1].pts[0], _globalWorld.lines[1].pts);
@@ -113,12 +112,18 @@ int main() {
 	vec3d finalSep;
 	//separateTillLastColl(&c1, &c2, c2.center - c1.center, finalSep);
 	//performLastSep(&c2, finalSep);
-	separateColliders(&c1, &c2, c2.center - c1.center);
+	//separateColliders(&c1, &c2, c2.center - c1.center);
+	physicalWorld pWorld;
+	pWorld.deltaTime = &(input::get()->deltaTime);
+	pWorld.addStaticBody(&c1);
+	pWorld.addBody(&c2);
+	pWorld.getBodyDP(0)->kP.vel = vec3d(5,0,-5);
 	//loop
 	while (1) {
 		data = _globalWorld.render(camera.sc, camera.vertex, color::getColor(0, 0, 0));
 		consoleController::get()->draw(&data);
 		updateCam(t, tNr);
+		pWorld.update();
 	}
 	
 	endProfiling();

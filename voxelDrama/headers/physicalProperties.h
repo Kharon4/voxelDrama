@@ -6,9 +6,9 @@ enum class combinationTechnique{average, greaterVal , lowerVal , thisVal , other
 struct physicalMaterial{
 	size_t materialIndex = 0;//higher wins
 	combinationTechnique CT = combinationTechnique::average;
-	float coeffRestitution;
-	float coeffLFriction;
-	float coeffRFriction;
+	float coeffRestitution = 0.5;
+	float coeffLFriction = 0.5;
+	float coeffRFriction = 0;
 };
 
 static const physicalMaterial defaultPMat = {0,combinationTechnique::average,0.5f,0.5f,0.0f };
@@ -37,7 +37,7 @@ struct kineticProperties {
 struct dynamicProperties {
 	kineticProperties kP;
 	physicalMaterial pMat;
-	double mass;
+	double mass = 1;
 	tensorOfInertia TOI;
 };
 
