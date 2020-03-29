@@ -59,7 +59,7 @@ int main() {
 	//setup graphics
 	cam camera;
 	camera.sc.xPixels = 200;
-	camera.sc.yPixels = 64;
+	camera.sc.yPixels = 100;
 
 	manipulation3dD::transform t;
 	manipulation3dD::transform tNr;
@@ -86,13 +86,13 @@ int main() {
 	//setup colliders
 	double scale = 10;
 	cuboidCollider c1(vec3d(0, 0, 0), vec3d(scale, scale, scale));
-	sphereCollider c2(scale,vec3d(-30, 0, 50));
+	sphereCollider c2(scale/2,vec3d(0, 0,10));
 	_globalWorld.lines.push_back(mesh::line(-vec3d(scale * 0.5, 0, 0), vec3d(scale * 0.5, 0, 0), &red));
 	_globalWorld.lines.push_back(mesh::line(-vec3d(0, scale * 0.5, 0), vec3d(0, scale * 0.5, 0), &green));
 	_globalWorld.lines.push_back(mesh::line(-vec3d(0, 0, scale * 0.5), vec3d(0, 0, scale * 0.5), &blue));
-	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(scale, 0, 0), c2.center + vec3d(scale, 0, 0), &red));
-	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, scale, 0), c2.center + vec3d(0, scale, 0), &green));
-	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, 0, scale), c2.center + vec3d(0, 0, scale), &blue));
+	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(scale/2, 0, 0), c2.center + vec3d(scale/2, 0, 0), &red));
+	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, scale/2, 0), c2.center + vec3d(0, scale/2, 0), &green));
+	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, 0, scale/2), c2.center + vec3d(0, 0, scale/2), &blue));
 	c1.M.addVec(_globalWorld.lines[0].pts[0], _globalWorld.lines[0].pts);
 	c1.M.addVec(_globalWorld.lines[0].pts[1], _globalWorld.lines[0].pts + 1);
 	c1.M.addVec(_globalWorld.lines[1].pts[0], _globalWorld.lines[1].pts);
@@ -117,7 +117,8 @@ int main() {
 	pWorld.deltaTime = &(input::get()->deltaTime);
 	pWorld.addStaticBody(&c1);
 	pWorld.addBody(&c2);
-	pWorld.getBodyDP(0)->kP.vel = vec3d(5,0,-5);
+	pWorld.getBodyDP(0)->kP.vel = vec3d(0, 0, 0);
+	pWorld.getBodyDP(0)->kP.angularVel = vec3d(0, 0, 10);
 	//loop
 	while (1) {
 		data = _globalWorld.render(camera.sc, camera.vertex, color::getColor(0, 0, 0));

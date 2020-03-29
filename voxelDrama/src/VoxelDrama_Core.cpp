@@ -60,8 +60,14 @@ void physicalWorld::updatePositions() {
 	}
 }
 
+void physicalWorld::applyGlobalForce() {
+	for (size_t i = 0; i < DP.size(); ++i) {
+		DP[i].kP.vel += globalForce * (*deltaTime);
+	}
+}
 
 void physicalWorld::update() {
+	applyGlobalForce();
 	//update initia pos
 	updatePositions();
 	
@@ -84,6 +90,23 @@ void physicalWorld::update() {
 				//final separation
 				performLastSep(colls[j],finalSep);
 			}
+		}
+	}
+
+	//dynamic dynamic collisions
+	for (size_t i = 0; i < colls.size(); ++i) {
+		for (size_t j = i + 1; j < colls.size(); ++j) {
+			//resolve collision
+			//get resolving axis
+			vec3d axis = DP[j].kP.vel - DP[i].kP.vel;
+			if (vec3d::isNUL(axis))axis = DP[j].kP.COM - DP[i].kP.COM;
+			if (vec3d::isNUL(axis))axis = vec3d(1, 0, 0);
+			vec3d finalSep;
+			vec3d collPt = separateTillLastColl(colls[i], colls[j], -axis, finalSep);
+			//calculate reaction
+			calculateNewVel(staticColls[i], colls[j], &DP[i], &DP[j], collPt, false);
+			//final separation
+			performLastSep(colls[j], finalSep);
 		}
 	}
 }

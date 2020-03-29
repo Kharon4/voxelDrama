@@ -9,9 +9,10 @@ private:
 	std::vector<collider*>colls;
 	std::vector<dynamicProperties> staticDP;
 	std::vector<dynamicProperties> DP;
-
+	void applyGlobalForce();
 public:
 	double* deltaTime = nullptr;
+	vec3d globalForce = vec3d(0,0,-9.8);
 
 	void addBody(collider* c, dynamicProperties* dp = nullptr);
 	void addStaticBody(collider* c, dynamicProperties* dp = nullptr);

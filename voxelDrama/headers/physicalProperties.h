@@ -6,7 +6,7 @@ enum class combinationTechnique{average, greaterVal , lowerVal , thisVal , other
 struct physicalMaterial{
 	size_t materialIndex = 0;//higher wins
 	combinationTechnique CT = combinationTechnique::average;
-	float coeffRestitution = 0.5;
+	float coeffRestitution = 0.75;
 	float coeffLFriction = 0.5;
 	float coeffRFriction = 0;
 };

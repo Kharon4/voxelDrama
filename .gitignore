@@ -8,5 +8,6 @@
 bin/Intermediate/
 bin/Debug/
 
+branding/test/
 
 results.json
