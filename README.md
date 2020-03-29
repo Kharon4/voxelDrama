@@ -1,8 +1,8 @@
-# VoxelDrama
+# voxelDrama
 A basic physics engine written in cpp
 ![logo](https://raw.githubusercontent.com/Kharon4/voxelDrama/master/branding/voxelDramaLogo.png)
 
-## VoxelDrama is deterministic 3D physics engine written in cpp. Targeted at windows x86 , x64 platforms.
+## voxelDrama is deterministic 3D physics engine written in cpp. Targeted at windows x86 , x64 platforms.
 *c++ standard library is the only external dependency for the project hence it can be compiled for virtually any platform.*
 
 ### Current features :
