@@ -11,25 +11,24 @@ A basic physics engine written in cpp
 	- Center of mass
 	- Tensor of Inertia and its inverse
 - [x] Inbuilt system for managing vectors other than the ones required for collider
-- [x] Basic physics smulation of rigid bodies
+- [x] Basic physics simulation of rigid bodies
 	- Collision Detection (discrete space, discrete time) 
 	- Collision Reaction
 	- Collision separation
 - [x] Priority based system for determination of collision properties
 
 ### Future Goals :
-- [ ] Continous time collision detection
+- [ ] Continuous time collision detection
 - [ ] Implementation of joints
 - [ ] Arbitrary constraints
-- [ ] Hardware accelleration using CUDA
+- [ ] Hardware acceleration using CUDA
 
 
-## Powered by [math3D](https://github.com/Kharon4/math3D)
+## Powered by [math3D v1.0-16.7.20](https://github.com/Kharon4/math3D/releases/tag/v1.0-16.7.20)
 ![math3D logo](https://raw.githubusercontent.com/Kharon4/math3D/master/branding/logo.png)
 
-## Tested using [consoleGraphics](https://github.com/Kharon4/consoleGraphics#consolegraphics)
+## Tested With [surrealRT v2.1-16.7.20](https://github.com/Kharon4/surrealRT/releases/tag/v2.1-16.7.20)
+
+ Older versions Tested using [consoleGraphics](https://github.com/Kharon4/consoleGraphics#consolegraphics)
 ![consoleGraphics logo](https://raw.githubusercontent.com/Kharon4/consoleGraphics/master/branding/logo.PNG)
-
-
-
 

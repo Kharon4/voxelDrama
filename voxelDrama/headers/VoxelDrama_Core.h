@@ -12,7 +12,7 @@ private:
 	void applyGlobalForce();
 public:
 	double* deltaTime = nullptr;
-	vec3d globalForce = vec3d(0,0,-9.8);
+	vec3d globalForce = vec3d(0,0,0);
 
 	void addBody(collider* c, dynamicProperties* dp = nullptr);
 	void addStaticBody(collider* c, dynamicProperties* dp = nullptr);

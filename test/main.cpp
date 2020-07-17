@@ -2,132 +2,145 @@
 #include <string>
 #include "collisionDetection.h"
 #include "profiler.h"
-#include "math3D/rotation.h"
-#include "consoleGraphics/renderer.h"
-#include "consoleGraphics/consoleController.h"
-#include "consoleGraphics/input.h"
+//#include "consoleGraphics/renderer.h"
+//#include "consoleGraphics/consoleController.h"
+//#include "consoleGraphics/input.h"
+#include "win32WindowingSystem.h"
+#include "rendering.cuh"
+#include "parsing/parsingAlgos/obj.h"
+
 #include "VoxelDrama_Core.h"
-solidCharShader defaultShader(color::getColor(0.5,0,0.5));
 
-solidCharShader collpt(color::getColor(1, 0, 0));
-solidCharShader red(color::getColor(1, 0, 0));
-solidCharShader green(color::getColor(0, 1, 0));
-solidCharShader blue(color::getColor(0, 0, 1));
+#define tostring(x) #x
+#define objLocation(x) tostring(./../submodules/surrealRT/test/res/x.obj)
 
-
-void updateCam(manipulation3dD::transform& t, manipulation3dD::transform& tNr) {
-	input::get()->update();
+bool updateCam(manipulation3d::transformf& t, manipulation3d::transformf& tNr) {
+	input::update();
 	double speed = 0.1;
 	double rSpeed = 0.001;
-	if (input::get()->isDown['E']) {
-		t.addRelativePos(vec3d(0, 0, speed));
+	if (input::pressed['X'])return false;
+
+	if (input::isDown['E']) {
+		t.CS.addRelativePos(vec3d(0, 0, speed));
 	}
-	if (input::get()->isDown['Q']) {
-		t.addRelativePos(vec3d(0, 0, -speed));
+	if (input::isDown['Q']) {
+		t.CS.addRelativePos(vec3d(0, 0, -speed));
 	}
-	if (input::get()->isDown['W']) {
-		t.addRelativePos(vec3d(speed, 0, 0));
+	if (input::isDown['W']) {
+		t.CS.addRelativePos(vec3d(speed, 0, 0));
 	}
-	if (input::get()->isDown['S']) {
-		t.addRelativePos(vec3d(-speed, 0, 0));
+	if (input::isDown['S']) {
+		t.CS.addRelativePos(vec3d(-speed, 0, 0));
 	}
-	if (input::get()->isDown['D']) {
-		t.addRelativePos(vec3d(0, -speed, 0));
+	if (input::isDown['D']) {
+		t.CS.addRelativePos(vec3d(0, -speed, 0));
 	}
-	if (input::get()->isDown['A']) {
-		t.addRelativePos(vec3d(0, speed, 0));
+	if (input::isDown['A']) {
+		t.CS.addRelativePos(vec3d(0, speed, 0));
 	}
-	if (input::get()->pressed['M']) {
-		input::get()->lockX = input::get()->mouseX;
-		input::get()->lockY = input::get()->mouseY;
-		input::get()->lock = !input::get()->lock;
+	if (input::pressed['M']) {
+		input::lockX = input::mouseX;
+		input::lockY = input::mouseY;
+		input::lock = !input::lock;
 	}
-	if (input::get()->lock){
-		input::get()->hideCursor();
-		vec3d rotationStep(-input::get()->changeX, -input::get()->changeY, 0);
+	if (input::lock){
+		input::hideCursor();
+		vec3d rotationStep(-input::changeX, -input::changeY, 0);
 		t.CS.setAngle(t.CS.getAngle() + (rotationStep * rSpeed));
 		tNr.CS.setAngle(tNr.CS.getAngle() + (rotationStep * rSpeed));
 	}
-	input::get()->showCursor();
+	input::showCursor();
 	t.update();
 	tNr.update();
+	return true;
 }
 
-int main() {
-	startProfiling();
 
-	//setup graphics
-	cam camera;
-	camera.sc.xPixels = 200;
-	camera.sc.yPixels = 100;
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
+	enableConsole();
+	unsigned short xRes=720, yRes=480;
+	camera cam(vec3f(0,-1,0),xRes,yRes,vec3f(0,0,0),vec3f(1,0,0),vec3f(0,0,((float)yRes)/xRes));
+	window dWindow(hInstance,nCmdShow,L"voxelDrama",xRes,yRes);
+	manipulation3d::transformf t;
+	manipulation3d::transformf tNr;
 
-	manipulation3dD::transform t;
-	manipulation3dD::transform tNr;
+	t.CS.setOrigin(cam.vertex);
+	t.CS.setAngle(vec3d(math3D_pi / 2, 0, 0));
+	tNr.CS.setAngle(vec3d(math3D_pi / 2, 0, 0));
 
-	t.CS.setOrigin(camera.vertex);
-	t.CS.setAngle(vec3d(manipulation3dD::pi / 2, 0, 0));
-	tNr.CS.setAngle(vec3d(manipulation3dD::pi / 2, 0, 0));
-
-	t.addVec(camera.sc.TopLeft, &camera.sc.TopLeft);
-	t.addVec(camera.vertex, &camera.vertex);
-	tNr.addVec(camera.sc.down, &camera.sc.down);
-	tNr.addVec(camera.sc.right, &camera.sc.right);
-	std::vector<std::vector<CHAR_INFO>>data;
-	{
-		mesh::triangle T(vec3d(0, 0, 0), vec3d(10, 0, 0), vec3d(10, 10, 0), &defaultShader);
-		_globalWorld.triangles.push_back(T);
-	}
-	{
-		mesh::triangle T(vec3d(0, 0, 0), vec3d(0, 10, 0), vec3d(10, 10, 0), &defaultShader);
-		_globalWorld.triangles.push_back(T);
-	}
-	consoleController::get(camera.sc.xPixels, camera.sc.yPixels, L"ConsoleGraphics - by AbhishekKhurana");
+	t.addVec(cam.sc.screenCenter, &cam.sc.screenCenter);
+	t.addVec(cam.vertex, &cam.vertex);
+	tNr.addVec(cam.sc.halfUp, &cam.sc.halfUp);
+	tNr.addVec(cam.sc.halfRight, &cam.sc.halfRight);
 	
 	//setup colliders
-	double scale = 10;
-	cuboidCollider c1(vec3d(0, 0, 0), vec3d(scale, scale, scale));
-	sphereCollider c2(scale/2,vec3d(0, 0,10));
-	_globalWorld.lines.push_back(mesh::line(-vec3d(scale * 0.5, 0, 0), vec3d(scale * 0.5, 0, 0), &red));
-	_globalWorld.lines.push_back(mesh::line(-vec3d(0, scale * 0.5, 0), vec3d(0, scale * 0.5, 0), &green));
-	_globalWorld.lines.push_back(mesh::line(-vec3d(0, 0, scale * 0.5), vec3d(0, 0, scale * 0.5), &blue));
-	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(scale/2, 0, 0), c2.center + vec3d(scale/2, 0, 0), &red));
-	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, scale/2, 0), c2.center + vec3d(0, scale/2, 0), &green));
-	_globalWorld.lines.push_back(mesh::line(c2.center - vec3d(0, 0, scale/2), c2.center + vec3d(0, 0, scale/2), &blue));
-	c1.M.addVec(_globalWorld.lines[0].pts[0], _globalWorld.lines[0].pts);
-	c1.M.addVec(_globalWorld.lines[0].pts[1], _globalWorld.lines[0].pts + 1);
-	c1.M.addVec(_globalWorld.lines[1].pts[0], _globalWorld.lines[1].pts);
-	c1.M.addVec(_globalWorld.lines[1].pts[1], _globalWorld.lines[1].pts + 1);
-	c1.M.addVec(_globalWorld.lines[2].pts[0], _globalWorld.lines[2].pts);
-	c1.M.addVec(_globalWorld.lines[2].pts[1], _globalWorld.lines[2].pts + 1);
-	c2.M.addVec(_globalWorld.lines[3].pts[0], _globalWorld.lines[3].pts);
-	c2.M.addVec(_globalWorld.lines[3].pts[1], _globalWorld.lines[3].pts + 1);
-	c2.M.addVec(_globalWorld.lines[4].pts[0], _globalWorld.lines[4].pts);
-	c2.M.addVec(_globalWorld.lines[4].pts[1], _globalWorld.lines[4].pts + 1);
-	c2.M.addVec(_globalWorld.lines[5].pts[0], _globalWorld.lines[5].pts);
-	c2.M.addVec(_globalWorld.lines[5].pts[1], _globalWorld.lines[5].pts + 1);
+	double scale = 2; //dia
+	sphereCollider c1(scale / 2, vec3d(0, 0, 0));
+	sphereCollider c2(scale / 2 ,vec3d(0, 0, 15));
 
-	//std::cout << colliding(&c1, &c2)<<std::endl;
-	//std::cout << getAColPT(&c1, &c2).x << " , " << getAColPT(&c1, &c2).y <<" , "<< getAColPT(&c1, &c2).z << std::endl;
-	system("pause");
-	vec3d finalSep;
-	//separateTillLastColl(&c1, &c2, c2.center - c1.center, finalSep);
-	//performLastSep(&c2, finalSep);
-	//separateColliders(&c1, &c2, c2.center - c1.center);
+
+	//graphical setup
+	const unsigned int estimatedNoFaces = 500;
+	commonMemory<meshShaded> Mesh(estimatedNoFaces);
+	loadBlankModel(Mesh.getHost(), estimatedNoFaces);
+	long int totalFacesLoaded = 0;
+
+	//load graphical bodies
+	shadedSolidColCPU obj1Shader(color(125, 125, 125), color(0.75, 0.25, 0.25), vec3f(-1, -2, -3));
+	
+	long int facesLoadedB1 = loadModel(Mesh.getHost() + totalFacesLoaded , estimatedNoFaces - totalFacesLoaded,objLocation(icoSphere),obj1Shader.getGPUPtr(),loadAxisExchange::xzy);
+	if (facesLoadedB1 < 0) { std::cout << "error loading Model\n"; system("pause"); return 0; }
+	else totalFacesLoaded += facesLoadedB1;
+	vec3d* sp1V = new vec3d[3 * facesLoadedB1];//sphere vertices
+	for (long int i = 0; i < facesLoadedB1; ++i) {
+		c1.M.addVec(Mesh.getHost()[i].M.pts[0], sp1V + i * 3);
+		c1.M.addVec(Mesh.getHost()[i].M.pts[1], sp1V + i * 3+1);
+		c1.M.addVec(Mesh.getHost()[i].M.pts[2], sp1V + i * 3+2);
+	}
+	c1.M.update();
+	long int facesLoadedB2 = loadModel(Mesh.getHost() + totalFacesLoaded, estimatedNoFaces - totalFacesLoaded, objLocation(icoSphere), obj1Shader.getGPUPtr(), loadAxisExchange::xzy);
+	if (facesLoadedB2 < 0) { std::cout << "error loading Model\n"; system("pause"); return 0; }
+	else totalFacesLoaded += facesLoadedB2;
+	vec3d* sp2V = new vec3d[3 * facesLoadedB2];//sphere vertices
+	for (long int i = 0; i < facesLoadedB2; ++i) {
+		c2.M.addVec(Mesh.getHost()[i].M.pts[0] + c2.M.CS.getOrigin(), sp2V + i * 3);
+		c2.M.addVec(Mesh.getHost()[i].M.pts[1] + c2.M.CS.getOrigin(), sp2V + i * 3 + 1);
+		c2.M.addVec(Mesh.getHost()[i].M.pts[2] + c2.M.CS.getOrigin(), sp2V + i * 3 + 2);
+	}
+	c2.M.update();
+	//graphical world setup
+	graphicalWorldADV world(&Mesh,xRes,yRes,3,3);
+	
+	//physical world setup
 	physicalWorld pWorld;
-	pWorld.deltaTime = &(input::get()->deltaTime);
-	pWorld.addStaticBody(&c1);
+	pWorld.deltaTime = &(input::deltaTime);
+	pWorld.addBody(&c1);
 	pWorld.addBody(&c2);
-	pWorld.getBodyDP(0)->kP.vel = vec3d(0, 0, 0);
-	pWorld.getBodyDP(0)->kP.angularVel = vec3d(0, 0, 10);
+	pWorld.update();
+	pWorld.getBodyDP(1)->kP.vel = vec3d(0, 0, -1.25);
+	//pWorld.getBodyDP(0)->kP.angularVel = vec3d(0.01, 0, 0);
+
+
+	std::cout << "total faces loaded = " << totalFacesLoaded << " / " << estimatedNoFaces << std::endl;
 	//loop
-	while (1) {
-		data = _globalWorld.render(camera.sc, camera.vertex, color::getColor(0, 0, 0));
-		consoleController::get()->draw(&data);
-		updateCam(t, tNr);
+	while (!dWindow.isWindowClosed() && updateCam(t, tNr)) {
+		world.render(cam, dWindow.data, [&dWindow]() {dWindow.update(); });
 		pWorld.update();
+		for (long int i = 0; i < facesLoadedB1; ++i) {
+			Mesh.getHost()[i].M.pts[0] = sp1V[3 * i + 0];
+			Mesh.getHost()[i].M.pts[1] = sp1V[3 * i + 1];
+			Mesh.getHost()[i].M.pts[2] = sp1V[3 * i + 2];
+		}
+		for (long int i = 0; i < facesLoadedB2; ++i) {
+			Mesh.getHost()[i + facesLoadedB1].M.pts[0] = sp2V[3 * i + 0];
+			Mesh.getHost()[i + facesLoadedB1].M.pts[1] = sp2V[3 * i + 1];
+			Mesh.getHost()[i + facesLoadedB1].M.pts[2] = sp2V[3 * i + 2];
+		}
+
 	}
 	
-	endProfiling();
-	system("pause");
+
+	delete[] sp1V;
+	delete[] sp2V;
 	return 0;
 }

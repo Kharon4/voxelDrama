@@ -1,0 +1,6 @@
+[submodule "submodules/math3D"]
+	path = submodules/math3D
+	url = https://github.com/Kharon4/math3D.git
+[submodule "submodules/surrealRT"]
+	path = submodules/surrealRT
+	url = https://github.com/Kharon4/surrealRT.git

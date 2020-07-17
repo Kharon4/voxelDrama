@@ -37,12 +37,12 @@ size_t physicalWorld::noStaticBodies() { return staticColls.size(); }
 
 void physicalWorld::updatePositions() {
 	for (size_t i = 0; i < colls.size(); ++i) {
-		DP[i].kP.COM = colls[i]->M.CS.getOrigin();
+		//DP[i].kP.COM = colls[i]->M.CS.getOrigin();
 		DP[i].kP.COM += DP[i].kP.vel * (*deltaTime);
-		colls[i]->MR.addRotationAboutAxis(DP[i].kP.angularVel * (*deltaTime));
-		colls[i]->M.addRotationAboutAxis(DP[i].kP.angularVel * (*deltaTime));
-		colls[i]->MT.CS.setOrigin(DP[i].kP.COM);
-		colls[i]->M.CS.setOrigin(DP[i].kP.COM);
+		colls[i]->MR.CS.addRotationAboutAxis(DP[i].kP.angularVel * (*deltaTime));
+		colls[i]->M.CS.addRotationAboutAxis(DP[i].kP.angularVel * (*deltaTime));
+		colls[i]->MT.CS.setOrigin(colls[i]->MT.CS.getOrigin()+DP[i].kP.COM);
+		colls[i]->M.CS.setOrigin(colls[i]->M.CS.getOrigin()+DP[i].kP.COM);
 		colls[i]->MR.update();
 		colls[i]->MT.update();
 		colls[i]->M.update();
@@ -50,8 +50,8 @@ void physicalWorld::updatePositions() {
 	for (size_t i = 0; i < staticColls.size(); ++i) {
 		staticDP[i].kP.COM = staticColls[i]->M.CS.getOrigin();
 		staticDP[i].kP.COM += staticDP[i].kP.vel * (*deltaTime);
-		staticColls[i]->MR.addRotationAboutAxis(staticDP[i].kP.angularVel * (*deltaTime));
-		staticColls[i]->M.addRotationAboutAxis(staticDP[i].kP.angularVel * (*deltaTime));
+		staticColls[i]->MR.CS.addRotationAboutAxis(staticDP[i].kP.angularVel * (*deltaTime));
+		staticColls[i]->M.CS.addRotationAboutAxis(staticDP[i].kP.angularVel * (*deltaTime));
 		staticColls[i]->MT.CS.setOrigin(staticDP[i].kP.COM);
 		staticColls[i]->M.CS.setOrigin(staticDP[i].kP.COM);
 		staticColls[i]->MR.update();
@@ -104,7 +104,7 @@ void physicalWorld::update() {
 			vec3d finalSep;
 			vec3d collPt = separateTillLastColl(colls[i], colls[j], axis, finalSep);
 			//calculate reaction
-			calculateNewVel(staticColls[i], colls[j], &DP[i], &DP[j], collPt, false);
+			calculateNewVel(colls[i], colls[j], &DP[i], &DP[j], collPt, false);
 			//final separation
 			performLastSep(colls[j], finalSep);
 		}

@@ -7,7 +7,7 @@ struct physicalMaterial{
 	size_t materialIndex = 0;//higher wins
 	combinationTechnique CT = combinationTechnique::average;
 	float coeffRestitution = 0.5;
-	float coeffLFriction = 0.05;
+	float coeffLFriction = 0.5;
 	float coeffRFriction = 3;
 };
 

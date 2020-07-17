@@ -25,7 +25,7 @@ intersectionType sphereCollider::inside(vec3d pt) {
 }
 
 vec3d sphereCollider::getNormal(vec3d pt) {
-	return vec3d::normalize(pt - center);
+	return vec3d::normalizeRaw_s(pt - center);
 }
 
 //cuboid collider
@@ -134,8 +134,8 @@ void capsuleCollider::boundingBox(vec3d& lower, vec3d& upper) {
 }
 
 intersectionType capsuleCollider::inside(vec3d pt) {
-	linearMathD::line ln(a, vec3d::subtract(b, a));
-	double dist = linearMathD::distance(pt, ln);
+	linearMath::lined ln(a, vec3d::subtract(b, a));
+	double dist = linearMath::distance(pt, ln);
 	if (dist > r)return intersectionType::outside;
 	if (dist < r) {
 		//check for line
@@ -156,17 +156,17 @@ intersectionType capsuleCollider::inside(vec3d pt) {
 
 vec3d capsuleCollider::getNormal(vec3d pt) {
 	vec3d DR = b - a;
-	double component = vec3d::component((pt - a), DR);
+	double component = vec3d::componentRaw_s((pt - a), DR);
 	if (component < 0)
-		return vec3d::normalize(pt - a);
+		return vec3d::normalizeRaw_s(pt - a);
 	if (component * component > DR.mag2())
-		return vec3d::normalize(pt - b);
-	else return vec3d::normalize((pt - a) - vec3d::dot(pt - a,DR) * (DR) / (DR).mag2());
+		return vec3d::normalizeRaw_s(pt - b);
+	else return vec3d::normalizeRaw_s((pt - a) - vec3d::dot(pt - a,DR) * (DR) / (DR).mag2());
 }
 
 //mesh collider
 
-meshCollider::meshCollider(std::vector<linearMathD::plane>* Planes,vec3d center) {
+meshCollider::meshCollider(std::vector<linearMath::planed>* Planes,vec3d center) {
 	DRs = new vec3d[(*Planes).size()];
 	PTs = new vec3d[(*Planes).size()];
 	M.CS.setOrigin(center);
@@ -211,9 +211,9 @@ intersectionType meshCollider::inside(vec3d pt) {
 vec3d meshCollider::getNormal(vec3d pt) {
 	if ((*M.getData()).size())return vec3d(0,0,0);
 	size_t meshId = 0;
-	double min = abs(linearMathD::aDistance(pt,linearMathD::plane(PTs[0],DRs[0])));
+	double min = abs(linearMath::aDistance(pt,linearMath::planed(PTs[0],DRs[0])));
 	for (size_t i = 1; i < (*M.getData()).size(); ++i) {
-		double dist = abs(linearMathD::aDistance(pt, linearMathD::plane(PTs[i], DRs[i])));
+		double dist = abs(linearMath::aDistance(pt, linearMath::planed(PTs[i], DRs[i])));
 		if (dist < min) {
 			min = dist;
 			meshId = i;

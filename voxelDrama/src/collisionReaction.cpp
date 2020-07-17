@@ -73,11 +73,11 @@ physicalMaterial getCollphysicalMat(physicalMaterial p1 , physicalMaterial p2) {
 
 
 inline vec3d getNormal(collider* c1, collider* c2, vec3d pt) {//wrt c2
-	return vec3d::normalize((c2->getNormal(pt) - c1->getNormal(pt)) / 2);
+	return vec3d::normalizeRaw_s((c2->getNormal(pt) - c1->getNormal(pt)) / 2);
 }
 
 inline vec3d getColParallel(vec3d normal, vec3d v1, vec3d v2) {//wrt c2 , here v is the vel of the points of coll
-	return vec3d::normalize((v1-v2) - (vec3d::dot((v1 - v2), normal) * normal)) ;
+	return vec3d::normalizeRaw_s((v1-v2) - (vec3d::dot((v1 - v2), normal) * normal)) ;
 }
 
 void calculateNewVel(collider* c1, collider* c2, dynamicProperties* d1, dynamicProperties* d2, vec3d collPt, bool STATIC) {
