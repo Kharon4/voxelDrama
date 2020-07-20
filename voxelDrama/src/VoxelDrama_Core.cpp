@@ -41,8 +41,8 @@ void physicalWorld::updatePositions() {
 		DP[i].kP.COM += DP[i].kP.vel * (*deltaTime);
 		colls[i]->MR.CS.addRotationAboutAxis(DP[i].kP.angularVel * (*deltaTime));
 		colls[i]->M.CS.addRotationAboutAxis(DP[i].kP.angularVel * (*deltaTime));
-		colls[i]->MT.CS.setOrigin(colls[i]->MT.CS.getOrigin()+DP[i].kP.COM);
-		colls[i]->M.CS.setOrigin(colls[i]->M.CS.getOrigin()+DP[i].kP.COM);
+		colls[i]->MT.CS.setOrigin(colls[i]->MT.CS.getOrigin()+ (DP[i].kP.vel * (*deltaTime)));
+		colls[i]->M.CS.setOrigin(colls[i]->M.CS.getOrigin()+ (DP[i].kP.vel * (*deltaTime)));
 		colls[i]->MR.update();
 		colls[i]->MT.update();
 		colls[i]->M.update();
@@ -89,6 +89,7 @@ void physicalWorld::update() {
 				calculateNewVel(staticColls[i], colls[j], &staticDP[i], &DP[j], collPt, true);
 				//final separation
 				performLastSep(colls[j],finalSep);
+				std::cout << "static coll Detected : " << i << " , " << j << std::endl;
 			}
 		}
 	}
@@ -96,17 +97,20 @@ void physicalWorld::update() {
 	//dynamic dynamic collisions
 	for (size_t i = 0; i < colls.size(); ++i) {
 		for (size_t j = i + 1; j < colls.size(); ++j) {
-			//resolve collision
-			//get resolving axis
-			vec3d axis = DP[i].kP.vel - DP[j].kP.vel;
-			if (vec3d::isNUL(axis))axis = DP[j].kP.COM - DP[i].kP.COM;
-			if (vec3d::isNUL(axis))axis = vec3d(1, 0, 0);
-			vec3d finalSep;
-			vec3d collPt = separateTillLastColl(colls[i], colls[j], axis, finalSep);
-			//calculate reaction
-			calculateNewVel(colls[i], colls[j], &DP[i], &DP[j], collPt, false);
-			//final separation
-			performLastSep(colls[j], finalSep);
+			if (colliding(colls[i], colls[j])) {
+				//resolve collision
+				//get resolving axis
+				vec3d axis = DP[i].kP.vel - DP[j].kP.vel;
+				if (vec3d::isNUL(axis))axis = DP[j].kP.COM - DP[i].kP.COM;
+				if (vec3d::isNUL(axis))axis = vec3d(1, 0, 0);
+				vec3d finalSep;
+				vec3d collPt = separateTillLastColl(colls[i], colls[j], axis, finalSep);
+				//calculate reaction
+				calculateNewVel(colls[i], colls[j], &DP[i], &DP[j], collPt, false);
+				//final separation
+				performLastSep(colls[j], finalSep);
+				std::cout << "dynamic coll Detected : " << i << " , " << j << std::endl;
+			}
 		}
 	}
 }

@@ -3,10 +3,12 @@
 #include "collisionReaction.h"
 #include "collisionSeparator.h"
 
+#include <iostream>//debugging
+
 class physicalWorld {
 private:
 	std::vector<collider*> staticColls;
-	std::vector<collider*>colls;
+	std::vector<collider*> colls;
 	std::vector<dynamicProperties> staticDP;
 	std::vector<dynamicProperties> DP;
 	void applyGlobalForce();

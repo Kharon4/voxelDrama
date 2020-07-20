@@ -30,8 +30,8 @@ vec3d operator /(vec3d v ,tensorOfInertia t);
 
 struct kineticProperties {
 	vec3d COM;
-	vec3d vel;
-	vec3d angularVel;
+	vec3d vel = vec3d(0,0,0);
+	vec3d angularVel = vec3d(0,0,0);
 };
 
 struct dynamicProperties {
