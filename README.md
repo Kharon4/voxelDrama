@@ -24,7 +24,7 @@ A basic physics engine written in cpp
 - [ ] Hardware acceleration using CUDA
 
 
-## Powered by [math3D v1.0-20.7.20-a](https://github.com/Kharon4/math3D/releases/tag/v1.0-20.7.20-a)
+## Powered by [math3D v1.1-21.7.20-a](https://github.com/Kharon4/math3D/releases/tag/v1.1-21.7.20-a)
 ![math3D logo](https://raw.githubusercontent.com/Kharon4/math3D/master/branding/logo.png)
 
 ## Tested With [surrealRT v2.1-16.7.20](https://github.com/Kharon4/surrealRT/releases/tag/v2.1-16.7.20)

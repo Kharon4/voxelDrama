@@ -7,8 +7,8 @@ struct physicalMaterial{
 	size_t materialIndex = 0;//higher wins
 	combinationTechnique CT = combinationTechnique::average;
 	float coeffRestitution = 0.5;
-	float coeffLFriction = 0.5;
-	float coeffRFriction = 3;
+	float coeffLFriction = 0.7;
+	float coeffRFriction = 0.2;
 };
 
 static const physicalMaterial defaultPMat = {0,combinationTechnique::average,0.5f,0.5f,0.0f };

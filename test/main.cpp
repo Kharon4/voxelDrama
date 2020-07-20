@@ -11,15 +11,15 @@
 
 #include "VoxelDrama_Core.h"
 
-#define tostring(x) #x
-#define objLocation(x) tostring(./../submodules/surrealRT/test/res/x.obj)
+//#define tostring(x) #x
+//#define objLocation(x) tostring(./../submodules/surrealRT/test/res/x.obj)
 
 bool updateCam(manipulation3d::transformf& t, manipulation3d::transformf& tNr) {
 	input::update();
 	double speed = 0.1;
 	double rSpeed = 0.001;
 	if (input::pressed['X'])return false;
-
+	if (input::isDown[VK_SPACE])speed *= 4;
 	if (input::isDown['E']) {
 		t.CS.addRelativePos(vec3d(0, 0, speed));
 	}
@@ -75,8 +75,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	//setup colliders
 	double scale = 2; //dia
-	sphereCollider c1(scale / 2, vec3d(0, 0, 0));
-	sphereCollider c2(scale / 2 ,vec3d(0.5, 0.5, 50));
+	//sphereCollider c1(scale / 2, vec3d(0, 0, 0));
+	cuboidCollider c1(vec3d(0, 0, 0), vec3d(scale, scale, scale));
+	sphereCollider c2(scale / 2 ,vec3d(0, 0, 10));
 
 	//graphical setup
 	const unsigned int estimatedNoFaces = 500;
@@ -87,7 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//load graphical bodies
 	shadedSolidColCPU obj1Shader(color(125, 10, 10), color(0.75, 0.25, 0.25), vec3f(-1, 0, 0));
 	shadedSolidColCPU obj2Shader(color(10, 125, 125), color(0.75, 0.25, 0.25), vec3f(-1, 0, 0));
-	long int facesLoadedB1 = loadModel(Mesh.getHost() + totalFacesLoaded , estimatedNoFaces - totalFacesLoaded,objLocation(icoSphere),obj1Shader.getGPUPtr(),loadAxisExchange::xzy);
+	long int facesLoadedB1 = loadModel(Mesh.getHost() + totalFacesLoaded , estimatedNoFaces - totalFacesLoaded, "./../submodules/surrealRT/test/res/cube.obj",obj1Shader.getGPUPtr(),loadAxisExchange::xzy);
 	if (facesLoadedB1 < 0) { std::cout << "error loading Model\n"; system("pause"); return 0; }
 	else totalFacesLoaded += facesLoadedB1;
 	vec3d* sp1V = new vec3d[3 * facesLoadedB1];//sphere vertices
@@ -97,14 +98,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		c1.M.addVec(Mesh.getHost()[i].M.pts[2], sp1V + i * 3+2);
 	}
 	c1.M.update();
-	long int facesLoadedB2 = loadModel(Mesh.getHost() + totalFacesLoaded, estimatedNoFaces - totalFacesLoaded, objLocation(icoSphere), obj2Shader.getGPUPtr(), loadAxisExchange::xzy);
+	long int facesLoadedB2 = loadModel(Mesh.getHost() + totalFacesLoaded, estimatedNoFaces - totalFacesLoaded, "./../submodules/surrealRT/test/res/icoSphere.obj", obj2Shader.getGPUPtr(), loadAxisExchange::xzy);
 	if (facesLoadedB2 < 0) { std::cout << "error loading Model\n"; system("pause"); return 0; }
 	else totalFacesLoaded += facesLoadedB2;
 	vec3d* sp2V = new vec3d[3 * facesLoadedB2];//sphere vertices
 	for (long int i = 0; i < facesLoadedB2; ++i) {
-		c2.M.addVec(Mesh.getHost()[i].M.pts[0] + c2.M.CS.getOrigin(), sp2V + i * 3);
-		c2.M.addVec(Mesh.getHost()[i].M.pts[1] + c2.M.CS.getOrigin(), sp2V + i * 3 + 1);
-		c2.M.addVec(Mesh.getHost()[i].M.pts[2] + c2.M.CS.getOrigin(), sp2V + i * 3 + 2);
+		c2.M.addVec(Mesh.getHost()[i + facesLoadedB1].M.pts[0] + c2.M.CS.getOrigin(), sp2V + i * 3);
+		c2.M.addVec(Mesh.getHost()[i + facesLoadedB1].M.pts[1] + c2.M.CS.getOrigin(), sp2V + i * 3 + 1);
+		c2.M.addVec(Mesh.getHost()[i + facesLoadedB1].M.pts[2] + c2.M.CS.getOrigin(), sp2V + i * 3 + 2);
 	}
 	c2.M.update();
 	//graphical world setup
@@ -113,23 +114,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//physical world setup
 	physicalWorld pWorld;
 	pWorld.deltaTime = &(input::deltaTime);
-	pWorld.addBody(&c1);
-	pWorld.addBody(&c2);
-	pWorld.update();
+	pWorld.globalForce = vec3d(0, 0, -9.8);
+	pWorld.addStaticBody(&c1);
 	//pWorld.getBodyDP(0)->kP.vel = vec3d(0, 0, 1);
-	pWorld.getBodyDP(0)->mass = 2;
-	pWorld.getBodyDP(1)->kP.vel = vec3d(0, 0, -5);
+	//pWorld.getStaticBodyDP(0)->mass = 2;
+	pWorld.getStaticBodyDP(0)->kP.angularVel = vec3d(0, 0, 1);
+	
+	pWorld.addBody(&c2);
+	pWorld.getBodyDP(0)->kP.angularVel = vec3d(0, 0, 0);
+	//pWorld.getBodyDP(0)->kP.vel = vec3d(0, 0, -5);
+
 	pWorld.getBodyDP(0)->pMat.coeffRestitution = 1;
-	pWorld.getBodyDP(1)->pMat.coeffRestitution = 1;
-	//pWorld.getBodyDP(0)->kP.angularVel = vec3d(1, 0, 0);
+	pWorld.getStaticBodyDP(0)->pMat.coeffRestitution = 0;
+	
+	
 
 	std::cout << "total faces loaded = " << totalFacesLoaded << " / " << estimatedNoFaces << std::endl;
+	
+	input::asyncGetch();
 	//loop
 	while (!dWindow.isWindowClosed() && updateCam(t, tNr)) {
 		world.render(cam, dWindow.data, [&dWindow]() {dWindow.update(); });
 		pWorld.update();
-		//std::cout << "O0 : " << pWorld.getBodyCol(0)->M.CS.getOrigin();
-		//std::cout << "   O1 : " << pWorld.getBodyCol(1)->M.CS.getOrigin() << std::endl;
 		for (long int i = 0; i < facesLoadedB1; ++i) {
 			Mesh.getHost()[i].M.pts[0] = sp1V[3 * i + 0];
 			Mesh.getHost()[i].M.pts[1] = sp1V[3 * i + 1];
